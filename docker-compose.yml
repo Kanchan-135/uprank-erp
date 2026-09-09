@@ -1,0 +1,21 @@
+version: '3.8'
+
+services:
+  school-erp:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: school_erp_app
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - DATABASE_URL=file:/app/dev.db
+      - JWT_SECRET=school-erp-super-secure-production-secret-key-2025
+      - NEXT_PUBLIC_APP_URL=http://localhost:3000
+    volumes:
+      - school_erp_data:/app/prisma
+
+volumes:
+  school_erp_data:
