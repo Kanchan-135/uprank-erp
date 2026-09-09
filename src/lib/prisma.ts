@@ -7,7 +7,16 @@ const globalForPrisma = globalThis as unknown as {
 };
 
 function getDatasourceUrl() {
-  const url = process.env.DATABASE_URL || "file:./dev.db";
+  let url = process.env.DATABASE_URL || "file:./dev.db";
+  // Ensure connection string uses postgresql:// for Prisma engine compatibility
+  if (url.startsWith("postgres://")) {
+    url = url.replace(/^postgres:\/\//, "postgresql://");
+  }
+  // Ensure pgbouncer=true is enabled when connecting to Supabase Transaction Pooler (port 6543)
+  if (url.includes(":6543") && !url.includes("pgbouncer=")) {
+    const separator = url.includes("?") ? "&" : "?";
+    url = `${url}${separator}pgbouncer=true`;
+  }
   if (url.startsWith("file:")) {
     const rawPath = url.replace("file:", "");
     if (!path.isAbsolute(rawPath)) {
